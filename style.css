@@ -698,6 +698,7 @@ h1, h2, h3 {
 }
 .site-nav a {
   display: block;
+  white-space: nowrap;
   padding: 8px 14px;
   border-radius: 999px;
   font-size: 0.95rem;
@@ -984,7 +985,7 @@ h1, h2, h3 {
 /* ---------- Responsive (Task 2) ---------- */
 
 /* Header: nav drops under the logo row, and the header stops sticking */
-@media (max-width: 860px) {
+@media (max-width: 1020px) {
   :root { --scroll-offset: 16px; }
 
   .site-header { position: relative; }
@@ -1440,6 +1441,190 @@ ol { margin: 0; padding: 0; list-style: none; }
   .pin-dot { width: 26px; height: 26px; font-size: 0.78rem; }
 }
 
+
+/* ==========================================================
+   TASK 4 ADDITIONS: interactive two-track roadmap
+   Track selector, "currently viewing" panel, and the small
+   states used by cards that script.js draws.
+   ========================================================== */
+
+/* visually hidden, still read by screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.hero-aside { margin-top: 22px; }
+
+/* anchors on this page must stop below the sticky track selector too */
+html.page-roadmap { --scroll-offset: calc(var(--header-h) + 104px); }
+
+/* ---------- Track selector ---------- */
+.roadmap-section { padding-bottom: clamp(60px, 8vw, 100px); }
+
+.track-bar {
+  position: sticky;
+  top: calc(var(--header-h) + 1px);   /* sits just under the sticky header */
+  z-index: 30;
+  background: rgba(255, 255, 255, 0.94);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 8px 24px rgba(13, 0, 77, 0.06);
+}
+.track-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 12px;
+}
+.bar-label { font-weight: 700; color: var(--muted); }
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  padding: 5px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  color: var(--navy);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.tab:hover { background: rgba(13, 0, 77, 0.07); }
+.tab[aria-selected="true"] { background: var(--navy); color: var(--white); }
+.tab[aria-selected="true"] .icon { color: var(--green); }
+
+.roadmap-body { padding-top: clamp(32px, 5vw, 56px); }
+
+.noscript-note {
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  background: rgba(57, 184, 10, 0.12);
+  border-radius: 12px;
+  font-weight: 600;
+}
+.noscript-note a { text-decoration: underline; }
+
+/* ---------- "Currently viewing" panel ---------- */
+.track-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px 40px;
+  padding: clamp(24px, 4vw, 36px);
+  background: var(--navy);
+  border-radius: var(--radius-lg);
+  color: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 18px 40px rgba(13, 0, 77, 0.18);
+}
+.track-head-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.track-head-main > div { min-width: 0; }
+.track-head .icon-chip { background: rgba(57, 184, 10, 0.18); }
+.viewing-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+.viewing-name {
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+.track-head-side { flex: 1 1 320px; min-width: 0; }
+.track-intro { font-size: 1.02rem; max-width: 62ch; }
+.track-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+.track-facts li {
+  padding: 6px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--white);
+}
+.pending-note {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  font-size: 0.92rem;
+}
+
+/* states used by cards drawn from script.js */
+.stop-desc-empty { font-style: italic; }
+.soon {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* cards slide in when a track is shown */
+.roadmap-dynamic .stop { animation: rise 0.5s calc(var(--i, 0) * 70ms) ease-out both; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Responsive (Task 4) ---------- */
+@media (max-width: 1020px) {
+  /* the main header scrolls away on small screens, so the selector goes to the very top */
+  .track-bar { top: 0; }
+  html.page-roadmap { --scroll-offset: 88px; }
+}
+
+@media (max-width: 640px) {
+  .bar-label { display: none; }
+  .track-bar-inner { padding-block: 10px; }
+  .tabs { width: 100%; }
+  .tab { flex: 1 1 0; min-width: 0; padding: 10px 8px; font-size: 0.95rem; line-height: 1.2; white-space: normal; text-align: center; }
+
+  .track-head { gap: 18px; }
+  .track-head-main { gap: 14px; }
+  html.page-roadmap { --scroll-offset: 80px; }
+}
+
+@media (max-width: 400px) {
+  .tab .icon { display: none; }
+  .site-nav a { padding: 8px 8px; font-size: 0.85rem; }
+}
+
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -1448,5 +1633,6 @@ ol { margin: 0; padding: 0; list-style: none; }
   .arch-nodes { animation: none; opacity: 1; }
   .pin,
   .track-scale::before { animation: none; }
+  .roadmap-dynamic .stop { animation: none; }
   * { transition: none !important; }
 }
